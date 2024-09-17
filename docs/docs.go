@@ -70,8 +70,8 @@ const docTemplate = `{
             }
         },
         "/api/v1/study-programs": {
-            "post": {
-                "description": "Get study programs based on the request",
+            "get": {
+                "description": "Get study programs based on the faculty in the query parameters",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,13 +84,10 @@ const docTemplate = `{
                 "summary": "Get Study Programs",
                 "parameters": [
                     {
-                        "description": "Study Programs Request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rest.StudyProgramsRequest"
-                        }
+                        "type": "string",
+                        "description": "Faculty",
+                        "name": "faculty",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -182,12 +179,14 @@ const docTemplate = `{
             ],
             "properties": {
                 "day": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "senin"
                 },
                 "study_programs": {
                     "type": "string",
                     "maxLength": 255,
-                    "minLength": 3
+                    "minLength": 3,
+                    "example": "matematika"
                 }
             }
         },
@@ -199,19 +198,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entities.RowData"
                     }
-                }
-            }
-        },
-        "rest.StudyProgramsRequest": {
-            "type": "object",
-            "required": [
-                "faculty"
-            ],
-            "properties": {
-                "faculty": {
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 3
                 }
             }
         },

@@ -52,28 +52,30 @@ func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
 }
 
 // GetStudyPrograms function is a handler to get study programs from the service
-// It will return the study programs based on the request
+// It will return the study programs based on the faculty provided in the query parameters
 // @Summary Get Study Programs
-// @Description Get study programs based on the request
+// @Description Get study programs based on the faculty in the query parameters
 // @Tags StudyPrograms
 // @Accept json
 // @Produce json
-// @Param data body StudyProgramsRequest true "Study Programs Request"
+// @Param faculty query string false "Faculty"
 // @Success 200 {object} StudyProgramsResponseSuccess
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /api/v1/study-programs [post]
+// @Router /api/v1/study-programs [get]
 func (h *ScheduleHandler) GetStudyPrograms(c *fiber.Ctx) error {
-	var req StudyProgramsRequest
-	if err := c.BodyParser(&req); err != nil {
-		return HandleError(c, fiber.StatusBadRequest, errors.New("invalid request"))
+	faculty := c.Query("faculty")
+	if err := h.validator.Validate(StudyProgramsRequest{Faculty: faculty}); err != nil {
+		return HandleError(c, fiber.StatusBadRequest, err)
 	}
 
-	studyPrograms, err := h.service.GetStudyPrograms(req.Faculty)
+	// Fetch study programs based on the faculty
+	studyPrograms, err := h.service.GetStudyPrograms(faculty)
 	if err != nil {
 		return HandleError(c, fiber.StatusInternalServerError, err)
 	}
 
+	// Return the study programs in the response
 	return c.Status(fiber.StatusOK).JSON(StudyProgramsResponseSuccess{
 		Data: studyPrograms,
 	})

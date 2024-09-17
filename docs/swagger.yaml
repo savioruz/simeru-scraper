@@ -40,8 +40,10 @@ definitions:
   rest.ScheduleRequest:
     properties:
       day:
+        example: senin
         type: string
       study_programs:
+        example: matematika
         maxLength: 255
         minLength: 3
         type: string
@@ -55,15 +57,6 @@ definitions:
         items:
           $ref: '#/definitions/entities.RowData'
         type: array
-    type: object
-  rest.StudyProgramsRequest:
-    properties:
-      faculty:
-        maxLength: 255
-        minLength: 3
-        type: string
-    required:
-    - faculty
     type: object
   rest.StudyProgramsResponseSuccess:
     properties:
@@ -115,17 +108,15 @@ paths:
       tags:
       - Schedule
   /api/v1/study-programs:
-    post:
+    get:
       consumes:
       - application/json
-      description: Get study programs based on the request
+      description: Get study programs based on the faculty in the query parameters
       parameters:
-      - description: Study Programs Request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/rest.StudyProgramsRequest'
+      - description: Faculty
+        in: query
+        name: faculty
+        type: string
       produces:
       - application/json
       responses:

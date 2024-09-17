@@ -3,13 +3,12 @@ package utils
 import "github.com/go-playground/validator/v10"
 
 var daysOfWeek = map[string]bool{
-	"Senin":  true,
-	"Selasa": true,
-	"Rabu":   true,
-	"Kamis":  true,
-	"Jumat":  true,
-	"Sabtu":  true,
-	"Minggu": true,
+	"senin":  true,
+	"selasa": true,
+	"rabu":   true,
+	"kamis":  true,
+	"jumat":  true,
+	"sabtu":  true,
 }
 
 type Validator struct {

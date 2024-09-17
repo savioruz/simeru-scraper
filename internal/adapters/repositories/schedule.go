@@ -26,13 +26,15 @@ func (s *DB) GetSchedule(studyPrograms, day string) (*[]entities.RowData, error)
 }
 
 func (s *DB) GetStudyPrograms(faculty string) (*[]entities.StudyPrograms, error) {
+	var key string
 	if faculty == "" {
-		return nil, errors.New("faculty cannot be empty")
+		key = "studyPrograms:all"
+	} else {
+		key = fmt.Sprintf("studyPrograms:faculty:%s", strings.ReplaceAll(faculty, " ", "_"))
 	}
 
 	var studyPrograms []entities.StudyPrograms
 
-	key := fmt.Sprintf("studyPrograms:faculty:%s", strings.ReplaceAll(faculty, " ", "_"))
 	err := s.cache.Get(key, &studyPrograms)
 	if err != nil {
 		return nil, errors.New("could not retrieve study programs from cache")

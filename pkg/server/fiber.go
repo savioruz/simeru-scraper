@@ -68,7 +68,7 @@ func (s *Fiber) initializeScheduleHandler() {
 
 	r := s.app.Group("/api/v1")
 	r.Post("/schedule", handler.GetSchedule)
-	r.Post("/study-programs", handler.GetStudyPrograms)
+	r.Get("/study-programs", handler.GetStudyPrograms)
 }
 
 func (s *Fiber) initializeRoutes() {

@@ -20,6 +20,7 @@ func (s *DB) ScrapeStudyPrograms(ctx context.Context, opts ...chromedp.ExecAlloc
 
 	var faculty []entities.Faculty
 	var studyPrograms = make(map[string][]entities.StudyPrograms)
+	var allStudyPrograms []entities.StudyPrograms
 
 	err := chromedp.Run(chromeCtx, chromedp.Tasks{
 		chromedp.Navigate("https://simeru.uad.ac.id/?mod=auth&sub=auth"),
@@ -60,11 +61,14 @@ func (s *DB) ScrapeStudyPrograms(ctx context.Context, opts ...chromedp.ExecAlloc
 
 				// Modify the `id` to include faculty name
 				for i := range valueStudyPrograms {
-					valueStudyPrograms[i].Faculty = f.Name
+					valueStudyPrograms[i].Faculty = strings.ToLower(f.Name)
 				}
 
 				// Store the study programs for this faculty
 				studyPrograms[f.Value] = valueStudyPrograms
+
+				// Append the study programs to the allStudyPrograms slice
+				allStudyPrograms = append(allStudyPrograms, valueStudyPrograms...)
 			}
 			return nil
 		}),
@@ -79,7 +83,7 @@ func (s *DB) ScrapeStudyPrograms(ctx context.Context, opts ...chromedp.ExecAlloc
 		var facultyName string
 		for _, f := range faculty {
 			if f.Value == facultyID {
-				facultyName = f.Name
+				facultyName = strings.ToLower(f.Name)
 				break
 			}
 		}
@@ -93,6 +97,13 @@ func (s *DB) ScrapeStudyPrograms(ctx context.Context, opts ...chromedp.ExecAlloc
 		}
 		log.Printf("Study programs cached for Faculty: %s", facultyName)
 	}
+	err = s.cache.Set("studyPrograms:all", allStudyPrograms, constant.DefaultExpiration)
+	if err != nil {
+		log.Printf("Error setting cache for key: studyPrograms:all")
+		return err
+	}
+
+	log.Printf("All study programs cached under key: studyPrograms:all")
 	return nil
 }
 
@@ -152,6 +163,7 @@ func (s *DB) ScrapeSchedule(ctx context.Context, opts ...chromedp.ExecAllocatorO
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			for facultyID, studyProgramLists := range studyPrograms {
 				for _, prodi := range studyProgramLists {
+					prodi.Name = strings.ToLower(prodi.Name)
 					log.Printf("Scraping data for Faculty: %s, Study Program: %s-[%s]", facultyID, prodi.Name, prodi.Value)
 					tableData, err := s.scrapeRowData(ctx, facultyID, prodi.Value)
 					if err != nil {
@@ -171,7 +183,7 @@ func (s *DB) ScrapeSchedule(ctx context.Context, opts ...chromedp.ExecAllocatorO
 							continue
 						}
 
-						key := fmt.Sprintf("schedule:studyPrograms:%s:day:%s", strings.ReplaceAll(prodi.Name, " ", "_"), day)
+						key := fmt.Sprintf("schedule:studyPrograms:%s:day:%s", strings.ReplaceAll(prodi.Name, " ", "_"), strings.ToLower(day))
 						err = s.cache.Set(key, rows, constant.DefaultExpiration)
 						if err != nil {
 							log.Printf("Error setting cache for key: %s", key)
