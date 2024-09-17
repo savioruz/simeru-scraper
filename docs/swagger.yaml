@@ -1,0 +1,152 @@
+basePath: /
+definitions:
+  entities.RowData:
+    properties:
+      dosen:
+        type: string
+      hari:
+        type: string
+      jam:
+        type: string
+      kelas:
+        type: string
+      kode:
+        type: string
+      matkul:
+        type: string
+      ruang:
+        type: string
+      semester:
+        type: string
+      sks:
+        type: string
+    type: object
+  entities.StudyPrograms:
+    properties:
+      faculty:
+        type: string
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  rest.ErrorResponse:
+    properties:
+      error:
+        type: string
+      request_id:
+        type: string
+    type: object
+  rest.ScheduleRequest:
+    properties:
+      day:
+        type: string
+      study_programs:
+        maxLength: 255
+        minLength: 3
+        type: string
+    required:
+    - day
+    - study_programs
+    type: object
+  rest.ScheduleResponseSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entities.RowData'
+        type: array
+    type: object
+  rest.StudyProgramsRequest:
+    properties:
+      faculty:
+        maxLength: 255
+        minLength: 3
+        type: string
+    required:
+    - faculty
+    type: object
+  rest.StudyProgramsResponseSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entities.StudyPrograms'
+        type: array
+    type: object
+info:
+  contact:
+    email: jakueenak@gmail.com
+    name: API Support
+  description: This is an auto-generated API Docs.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Simeru Scraper API
+  version: "0.1"
+paths:
+  /api/v1/schedule:
+    post:
+      consumes:
+      - application/json
+      description: Get schedule based on the request
+      parameters:
+      - description: Schedule Request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.ScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.ScheduleResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get Schedule
+      tags:
+      - Schedule
+  /api/v1/study-programs:
+    post:
+      consumes:
+      - application/json
+      description: Get study programs based on the request
+      parameters:
+      - description: Study Programs Request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/rest.StudyProgramsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.StudyProgramsResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      summary: Get Study Programs
+      tags:
+      - StudyPrograms
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
