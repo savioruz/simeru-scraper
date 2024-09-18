@@ -1,5 +1,22 @@
 {
   "rewrites": [
-    { "source": "(.*)", "destination": "api/index.go" }
+    {
+      "source": "(.*)",
+      "destination": "/api/index.go"
+    }
+  ],
+  "functions": {
+    "api/index.go": {
+      "runtime": "go"
+    },
+    "api/scrape.go": {
+      "runtime": "go"
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/scrape",
+      "schedule": "0 0 * * *"
+    }
   ]
 }

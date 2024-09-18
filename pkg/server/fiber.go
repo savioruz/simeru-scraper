@@ -48,7 +48,6 @@ func (s *Fiber) ServerStart() {
 }
 
 func (s *Fiber) Adaptor() http.HandlerFunc {
-	s.cron.Start()
 	s.initializeScheduleHandler()
 	s.initializeRoutes()
 
