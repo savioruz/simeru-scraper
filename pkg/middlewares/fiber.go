@@ -20,7 +20,7 @@ func FiberMiddleware(a *fiber.App) {
 		},
 	))
 	a.Use(cors.New(cors.Config{
-		AllowOrigins: "https://*.savioruz.me",
+		AllowOrigins: "https://*.savioruz.me, https://simeru.vercel.app",
 		AllowHeaders: "Origin, Content-Type, Accept",
 		AllowMethods: "GET,POST",
 	}))
