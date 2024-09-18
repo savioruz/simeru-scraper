@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/savioruz/simeru-scraper/config"
 	"github.com/savioruz/simeru-scraper/internal/adapters/cache"
 	"github.com/savioruz/simeru-scraper/internal/adapters/handlers/rest"
@@ -13,7 +12,6 @@ import (
 	"github.com/savioruz/simeru-scraper/pkg/middlewares"
 	"github.com/savioruz/simeru-scraper/pkg/routes"
 	"github.com/savioruz/simeru-scraper/pkg/utils"
-	"net/http"
 	"os"
 	"os/signal"
 )
@@ -45,13 +43,6 @@ func (s *Fiber) ServerStart() {
 	s.initializeScheduleHandler()
 	s.initializeRoutes()
 	s.startServerWithGrafeculShutdown()
-}
-
-func (s *Fiber) Adaptor() http.HandlerFunc {
-	s.initializeScheduleHandler()
-	s.initializeRoutes()
-
-	return adaptor.FiberApp(s.app)
 }
 
 func (s *Fiber) initializeScheduleHandler() {
