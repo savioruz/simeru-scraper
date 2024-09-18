@@ -4,19 +4,16 @@
   ],
   "functions": {
     "api/index.go": {
-      "runtime": "vercel-go@3.1.2",
-      "regions": ["sin1"]
+      "runtime": "vercel-go@3.1.2"
     },
     "api/scrape.go": {
-      "runtime": "vercel-go@3.1.2",
-      "regions": ["sin1"]
+      "runtime": "vercel-go@3.1.2"
     }
   },
   "crons": [
     {
       "path": "/api/scrape",
-      "schedule": "0 0 * * *",
-      "regions": ["sin1"]
+      "schedule": "0 0 * * *"
     }
   ]
 }
