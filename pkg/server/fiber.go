@@ -57,7 +57,7 @@ func (s *Fiber) initializeScheduleHandler() {
 	handler := rest.NewScheduleHandler(service, validator)
 
 	r := s.app.Group("/api/v1")
-	r.Post("/schedule", handler.GetSchedule)
+	r.Get("/schedule", handler.GetSchedule)
 	r.Get("/study-programs", handler.GetStudyPrograms)
 }
 

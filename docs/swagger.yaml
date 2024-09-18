@@ -37,20 +37,6 @@ definitions:
       request_id:
         type: string
     type: object
-  rest.ScheduleRequest:
-    properties:
-      day:
-        example: senin
-        type: string
-      study_programs:
-        example: matematika
-        maxLength: 255
-        minLength: 3
-        type: string
-    required:
-    - day
-    - study_programs
-    type: object
   rest.ScheduleResponseSuccess:
     properties:
       data:
@@ -78,17 +64,21 @@ info:
   version: "0.1"
 paths:
   /api/v1/schedule:
-    post:
+    get:
       consumes:
       - application/json
       description: Get schedule based on the request
       parameters:
-      - description: Schedule Request
-        in: body
-        name: data
+      - description: Study Programs
+        in: query
+        name: study_programs
         required: true
-        schema:
-          $ref: '#/definitions/rest.ScheduleRequest'
+        type: string
+      - description: Day
+        in: query
+        name: day
+        required: true
+        type: string
       produces:
       - application/json
       responses:

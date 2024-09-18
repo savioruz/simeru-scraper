@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/savioruz/simeru-scraper/internal/cores/services"
 	"github.com/savioruz/simeru-scraper/pkg/utils"
@@ -26,17 +25,19 @@ func NewScheduleHandler(service *services.ScheduleService, validator *utils.Vali
 // @Tags Schedule
 // @Accept json
 // @Produce json
-// @Param data body ScheduleRequest true "Schedule Request"
+// @Param study_programs query string true "Study Programs"
+// @Param day query string true "Day"
 // @Success 200 {object} ScheduleResponseSuccess
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /api/v1/schedule [post]
+// @Router /api/v1/schedule [get]
 func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
-	var req ScheduleRequest
-	if err := c.BodyParser(&req); err != nil {
-		return HandleError(c, fiber.StatusBadRequest, errors.New("invalid request"))
+	studyPrograms := c.Query("study_programs")
+	day := c.Query("day")
+	req := ScheduleRequest{
+		StudyPrograms: studyPrograms,
+		Day:           day,
 	}
-
 	if err := h.validator.Validate(req); err != nil {
 		return HandleError(c, fiber.StatusBadRequest, err)
 	}
@@ -65,7 +66,10 @@ func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
 // @Router /api/v1/study-programs [get]
 func (h *ScheduleHandler) GetStudyPrograms(c *fiber.Ctx) error {
 	faculty := c.Query("faculty")
-	if err := h.validator.Validate(StudyProgramsRequest{Faculty: faculty}); err != nil {
+	req := StudyProgramsRequest{
+		Faculty: faculty,
+	}
+	if err := h.validator.Validate(req); err != nil {
 		return HandleError(c, fiber.StatusBadRequest, err)
 	}
 

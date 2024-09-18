@@ -24,7 +24,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/schedule": {
-            "post": {
+            "get": {
                 "description": "Get schedule based on the request",
                 "consumes": [
                     "application/json"
@@ -38,13 +38,18 @@ const docTemplate = `{
                 "summary": "Get Schedule",
                 "parameters": [
                     {
-                        "description": "Schedule Request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rest.ScheduleRequest"
-                        }
+                        "type": "string",
+                        "description": "Study Programs",
+                        "name": "study_programs",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Day",
+                        "name": "day",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -168,25 +173,6 @@ const docTemplate = `{
                 },
                 "request_id": {
                     "type": "string"
-                }
-            }
-        },
-        "rest.ScheduleRequest": {
-            "type": "object",
-            "required": [
-                "day",
-                "study_programs"
-            ],
-            "properties": {
-                "day": {
-                    "type": "string",
-                    "example": "senin"
-                },
-                "study_programs": {
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 3,
-                    "example": "matematika"
                 }
             }
         },
