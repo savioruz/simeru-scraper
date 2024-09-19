@@ -33,6 +33,7 @@ run: swag build
 docker.build: swag
 	sed -i 's/\[\"\/build\/simeru-scraper\", \"\/\"\]/\[\"\/build\/simeru-scraper\", \"\/build\/\.env\", \"\/\"\]/' Dockerfile
 	docker build -t $(APP_NAME):$(APP_VERSION) .
+	sed -i 's/\[\"\/build\/simeru-scraper\", \"\/build\/\.env\"/\[\"\/build\/simeru-scraper\"/' Dockerfile
 
 docker.network.add:
 	@if docker network inspect net-$(APP_NAME) >/dev/null 2>&1; then \
