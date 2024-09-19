@@ -32,13 +32,13 @@ func NewRedisCache(addr, password string, db int) (*RedisCache, error) {
 func (r *RedisCache) Get(key string, value interface{}) error {
 	data, err := r.client.Get(context.Background(), key).Result()
 	if errors.Is(err, redis.Nil) {
-		return errors.New("cache miss for key: " + key)
+		return ErrCacheMiss
 	} else if err != nil {
-		return errors.New("failed to get data from redis for key: " + key)
+		return ErrCacheFailed
 	}
 
 	if err := json.Unmarshal([]byte(data), value); err != nil {
-		return errors.New("failed to unmarshal data")
+		return ErrUnmarshal
 	}
 
 	return nil
@@ -47,11 +47,11 @@ func (r *RedisCache) Get(key string, value interface{}) error {
 func (r *RedisCache) Set(key string, value interface{}, expiration time.Duration) error {
 	data, err := json.Marshal(value)
 	if err != nil {
-		return errors.New("failed to marshal data for key: " + key)
+		return ErrMarshal
 	}
 
 	if _, err := r.client.Set(context.Background(), key, data, expiration).Result(); err != nil {
-		return errors.New("failed to set data to redis for key: " + key)
+		return ErrCacheFailed
 	}
 
 	return nil

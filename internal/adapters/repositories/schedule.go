@@ -3,8 +3,8 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"github.com/savioruz/simeru-scraper/internal/adapters/cache"
 	"github.com/savioruz/simeru-scraper/internal/cores/entities"
-	"log"
 	"strings"
 )
 
@@ -16,8 +16,15 @@ func (s *DB) GetSchedule(studyPrograms, day string) (*[]entities.RowData, error)
 	var schedule []entities.RowData
 
 	key := fmt.Sprintf("schedule:studyPrograms:%s:day:%s", strings.ReplaceAll(studyPrograms, " ", "_"), day)
-	log.Printf("key: %s", key)
 	err := s.cache.Get(key, &schedule)
+	if errors.Is(err, cache.ErrCacheMiss) {
+		return nil, cache.ErrCacheMiss
+	}
+
+	if errors.Is(err, cache.ErrCacheFailed) {
+		return nil, cache.ErrCacheFailed
+	}
+
 	if err != nil {
 		return nil, errors.New("could not retrieve schedule from cache")
 	}
@@ -36,6 +43,14 @@ func (s *DB) GetStudyPrograms(faculty string) (*[]entities.StudyPrograms, error)
 	var studyPrograms []entities.StudyPrograms
 
 	err := s.cache.Get(key, &studyPrograms)
+	if errors.Is(err, cache.ErrCacheMiss) {
+		return nil, cache.ErrCacheMiss
+	}
+
+	if errors.Is(err, cache.ErrCacheFailed) {
+		return nil, cache.ErrCacheFailed
+	}
+
 	if err != nil {
 		return nil, errors.New("could not retrieve study programs from cache")
 	}

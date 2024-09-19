@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/savioruz/simeru-scraper/internal/adapters/cache"
 	"github.com/savioruz/simeru-scraper/internal/cores/services"
 	"github.com/savioruz/simeru-scraper/pkg/utils"
 )
@@ -29,11 +31,13 @@ func NewScheduleHandler(service *services.ScheduleService, validator *utils.Vali
 // @Param day query string true "Day"
 // @Success 200 {object} ScheduleResponseSuccess
 // @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/schedule [get]
 func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
 	studyPrograms := c.Query("study_programs")
 	day := c.Query("day")
+
 	req := ScheduleRequest{
 		StudyPrograms: studyPrograms,
 		Day:           day,
@@ -44,6 +48,9 @@ func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
 
 	schedule, err := h.service.GetSchedule(req.StudyPrograms, req.Day)
 	if err != nil {
+		if errors.Is(err, cache.ErrCacheMiss) {
+			return HandleError(c, fiber.StatusNotFound, errors.New("schedule not found"))
+		}
 		return HandleError(c, fiber.StatusInternalServerError, err)
 	}
 
@@ -62,10 +69,12 @@ func (h *ScheduleHandler) GetSchedule(c *fiber.Ctx) error {
 // @Param faculty query string false "Faculty"
 // @Success 200 {object} StudyProgramsResponseSuccess
 // @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/study-programs [get]
 func (h *ScheduleHandler) GetStudyPrograms(c *fiber.Ctx) error {
 	faculty := c.Query("faculty")
+
 	req := StudyProgramsRequest{
 		Faculty: faculty,
 	}
@@ -73,13 +82,14 @@ func (h *ScheduleHandler) GetStudyPrograms(c *fiber.Ctx) error {
 		return HandleError(c, fiber.StatusBadRequest, err)
 	}
 
-	// Fetch study programs based on the faculty
 	studyPrograms, err := h.service.GetStudyPrograms(faculty)
 	if err != nil {
+		if errors.Is(err, cache.ErrCacheMiss) {
+			return HandleError(c, fiber.StatusNotFound, errors.New("study programs not found"))
+		}
 		return HandleError(c, fiber.StatusInternalServerError, err)
 	}
 
-	// Return the study programs in the response
 	return c.Status(fiber.StatusOK).JSON(StudyProgramsResponseSuccess{
 		Data: studyPrograms,
 	})
