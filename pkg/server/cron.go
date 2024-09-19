@@ -45,6 +45,7 @@ func (c *CronAdapter) Start() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 
+		log.Printf("scraping started at %s", time.Now().Format(time.RFC3339))
 		if err := scrape.ScrapeStudyPrograms(ctx, opts...); err != nil {
 			log.Printf("failed to scrape study programs: %v", err)
 		} else {
