@@ -38,10 +38,11 @@ func (c *CronAdapter) Start() {
 		chromedp.UserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"),
 		chromedp.Flag("headless", true),
 		chromedp.Flag("disable-gpu", true),
+		chromedp.Flag("ignore-certificate-errors", true),
 	)
 	repos := repositories.NewDB(redis)
 	scrape := services.NewScrapeService(repos)
-	_, err = c.cron.AddFunc("1 0 * * *", func() {
+	_, err = c.cron.AddFunc("1 1 * * *", func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 
