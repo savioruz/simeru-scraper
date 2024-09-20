@@ -50,6 +50,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Update the CA certificates
+RUN update-ca-certificates
+
 # Copy binary and config files from /build to root folder of scratch container.
 COPY --from=builder ["/build/simeru-scraper", "/"]
 
