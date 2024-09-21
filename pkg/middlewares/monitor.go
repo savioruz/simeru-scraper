@@ -12,5 +12,10 @@ func MonitorMiddleware(a *fiber.App) {
 			Title: "Short URL API Monitor",
 		},
 	))
-	a.Use(healthcheck.New())
+	a.Use(healthcheck.New(
+		healthcheck.Config{
+			LivenessEndpoint:  "/api/v1/livez",
+			ReadinessEndpoint: "/api/v1/readyz",
+		},
+	))
 }
