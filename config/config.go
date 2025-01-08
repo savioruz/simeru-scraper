@@ -2,16 +2,18 @@ package config
 
 import (
 	"fmt"
-	_ "github.com/joho/godotenv/autoload"
 	"log"
 	"os"
 	"strconv"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // Config holds the configuration settings for the application
 type Config struct {
 	Server ServerConfig
 	Redis  RedisConfig
+	Scrape ScrapeConfig
 }
 
 // ServerConfig holds the configuration settings for the server
@@ -25,6 +27,11 @@ type RedisConfig struct {
 	Addr     string
 	Password string
 	DB       int
+}
+
+// ScrapeConfig holds the configuration settings for Scrape
+type ScrapeConfig struct {
+	Interval int
 }
 
 // LoadConfig loads configuration from environment variables
@@ -42,6 +49,11 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("invalid REDIS_DB value: %v", err)
 	}
 
+	scrapeInterval, err := strconv.Atoi(getEnv("SCRAPE_INTERVAL", "12"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid SCRAPE_INTERVAL value: %v", err)
+	}
+
 	return &Config{
 		Server: ServerConfig{
 			Host: host,
@@ -51,6 +63,9 @@ func LoadConfig() (*Config, error) {
 			Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
 			Password: redisPassword,
 			DB:       redisDB,
+		},
+		Scrape: ScrapeConfig{
+			Interval: scrapeInterval,
 		},
 	}, nil
 }

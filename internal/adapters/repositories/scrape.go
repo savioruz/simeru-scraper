@@ -3,12 +3,13 @@ package repositories
 import (
 	"context"
 	"fmt"
-	"github.com/chromedp/chromedp"
-	"github.com/savioruz/simeru-scraper/internal/cores/entities"
-	"github.com/savioruz/simeru-scraper/pkg/constant"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/chromedp/chromedp"
+	"github.com/savioruz/simeru-scraper/internal/cores/entities"
+	"github.com/savioruz/simeru-scraper/pkg/constant"
 )
 
 func (s *DB) ScrapeStudyPrograms(ctx context.Context, opts ...chromedp.ExecAllocatorOption) error {
@@ -147,7 +148,10 @@ func (s *DB) ScrapeSchedule(ctx context.Context, opts ...chromedp.ExecAllocatorO
 
 				// Get the Prodi options for the selected Faculty
 				var valueStudyPrograms []entities.StudyPrograms
-				err = chromedp.Run(ctx, chromedp.Evaluate(`Array.from(document.querySelectorAll('select[name="prodi"] option')).filter(option => option.value !== "").map(option => ({ value: option.value, name: option.text }))`, &valueStudyPrograms))
+				err = chromedp.Run(ctx, chromedp.Evaluate(
+					`Array.from(document.querySelectorAll('select[name="prodi"] option')).filter(option => option.value !== "").map(option => ({ value: option.value, name: option.text }))`,
+					&valueStudyPrograms,
+				))
 				if err != nil {
 					log.Printf("Error getting Prodi options for Faculty: %s", f.Value)
 				}
@@ -164,7 +168,7 @@ func (s *DB) ScrapeSchedule(ctx context.Context, opts ...chromedp.ExecAllocatorO
 					prodi.Name = strings.ToLower(prodi.Name)
 					tableData, err := s.scrapeRowData(ctx, facultyID, prodi.Value)
 					if err != nil {
-						log.Printf("Error scraping table data for Faculty: %s, Study Program: %s", facultyID, prodi.Value)
+						log.Printf("Error scraping table data for Faculty: %s, Study Program: %s: %v", facultyID, prodi.Value, err)
 						continue
 					}
 

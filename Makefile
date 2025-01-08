@@ -59,3 +59,12 @@ docker.redis.run:
 
 docker.stop.redis:
 	docker stop redis-$(APP_NAME)
+
+generate-mocks:
+	@set -euo pipefail; \
+	for file in $$(find . -name '*.go' | grep -v proto | grep -v /vendor/); do \
+		if grep -q "^type.*interface {" "$$file"; then \
+			dest=$$(echo "$$file" | sed 's|internal/||'); \
+			mockgen -source="$$file" -destination="test/mock/$$dest"; \
+		fi; \
+	done

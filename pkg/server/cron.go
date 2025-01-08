@@ -3,14 +3,16 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/chromedp/chromedp"
 	"github.com/robfig/cron/v3"
 	"github.com/savioruz/simeru-scraper/config"
 	"github.com/savioruz/simeru-scraper/internal/adapters/cache"
 	"github.com/savioruz/simeru-scraper/internal/adapters/repositories"
 	"github.com/savioruz/simeru-scraper/internal/cores/services"
-	"log"
-	"time"
+	"github.com/savioruz/simeru-scraper/pkg/utils"
 )
 
 type CronAdapter struct {
@@ -45,24 +47,18 @@ func (c *CronAdapter) Start() {
 		chromedp.NoDefaultBrowserCheck,
 	)
 	repos := repositories.NewDB(redis)
+	scrapeInterval := utils.IntervalToCron(c.conf.Scrape.Interval)
 	scrape := services.NewScrapeService(repos)
-	_, err = c.cron.AddFunc("0 */12 * * *", func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-		defer cancel()
-
+	_, err = c.cron.AddFunc(scrapeInterval, func() {
 		log.Printf("scraping started at %s", time.Now().Format(time.RFC3339))
 
-		if err := retries(ctx, func(ctx context.Context) error {
-			return scrape.ScrapeStudyPrograms(ctx, opts...)
-		}, "study programs"); err != nil {
+		if err := scrapeWithRetries(opts, scrape.ScrapeStudyPrograms, "study programs"); err != nil {
 			log.Printf("failed to scrape study programs after retries: %v", err)
 		} else {
 			log.Printf("study programs scraped successfully at %s", time.Now().Format(time.RFC3339))
 		}
 
-		if err := retries(ctx, func(ctx context.Context) error {
-			return scrape.ScrapeSchedule(ctx, opts...)
-		}, "schedule"); err != nil {
+		if err := scrapeWithRetries(opts, scrape.ScrapeSchedule, "schedule"); err != nil {
 			log.Printf("failed to scrape schedule after retries: %v", err)
 		} else {
 			log.Printf("schedule scraped successfully at %s", time.Now().Format(time.RFC3339))
@@ -80,28 +76,27 @@ func (c *CronAdapter) Stop() {
 	c.cron.Stop()
 }
 
-func retries(ctx context.Context, scrapeFn func(context.Context) error, taskName string) error {
+func scrapeWithRetries(opts []chromedp.ExecAllocatorOption, scrapeFn func(context.Context, ...chromedp.ExecAllocatorOption) error, taskName string) error {
 	maxRetries := 3
-	var err error
+	var lastErr error
 
 	for i := 0; i < maxRetries; i++ {
-		err = scrapeFn(ctx)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		err := scrapeFn(ctx, opts...)
+		cancel()
+
 		if err == nil {
 			return nil
 		}
 
+		lastErr = err
 		log.Printf("failed to scrape %s (attempt %d/%d): %v", taskName, i+1, maxRetries, err)
 
-		// If this is not the last attempt, wait before retrying
 		if i < maxRetries-1 {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case <-time.After(time.Duration(i+1) * time.Second):
-				// Exponential backoff
-			}
+			backoffDuration := time.Duration(1<<uint(i)) * time.Second
+			time.Sleep(backoffDuration)
 		}
 	}
 
-	return fmt.Errorf("failed to scrape %s after %d attempts: %v", taskName, maxRetries, err)
+	return fmt.Errorf("failed to scrape %s after %d attempts: %v", taskName, maxRetries, lastErr)
 }
