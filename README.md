@@ -4,9 +4,13 @@ Simeru Scraper is a web scraper that scrapes schedules from the official website
 
 [![Go](https://img.shields.io/github/go-mod/go-version/savioruz/simeru-scraper)](https://golang.org/)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/savioruz/simeru-scraper)
-[![Go Report Card](https://goreportcard.com/badge/github.com/savioruz/roastgithub-api)](https://goreportcard.com/report/github.com/savioruz/simeru-scraper)
+[![Go Report Card](https://goreportcard.com/badge/github.com/savioruz/simeru-scraper)](https://goreportcard.com/report/github.com/savioruz/simeru-scraper)
 [![GitHub issues](https://img.shields.io/github/issues/savioruz/simeru-scraper)](https://goreportcard.com/report/github.com/savioruz/simeru-scraper)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/savioruz/simeru-scraper)](https://goreportcard.com/report/github.com/savioruz/simeru-scraper)
+
+## This repository has moved
+
+The Simeru Scraper repository has been moved to [https://github.com/savioruz/smrv2-api](https://github.com/savioruz/smrv2-api). This repository is now archived and no longer maintained.
 
 ## Table of Contents
 
@@ -33,7 +37,7 @@ Simeru Scraper is a web scraper that scrapes schedules from the official website
 ## Deployment
 
 - ### Koyeb
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=github.com/savioruz/roastgithub-api&branch=main&ports=3000;http;/&name=simeru-scraper-koyeb&env[APP_HOST]=0.0.0.0&env[APP_PORT]=3000&env[REDIS_HOST]=YOUR_REDIS_HOST&env[REDIS_PORT]=6379&env[REDIS_PASSWORD]=&env[REDIS_DB_NUMBER]=0)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=github.com/savioruz/simeru-scraper&branch=main&ports=3000;http;/&name=simeru-scraper-koyeb&env[APP_HOST]=0.0.0.0&env[APP_PORT]=3000&env[REDIS_HOST]=YOUR_REDIS_HOST&env[REDIS_PORT]=6379&env[REDIS_PASSWORD]=&env[REDIS_DB_NUMBER]=0)
 
 ## Requirements
 
